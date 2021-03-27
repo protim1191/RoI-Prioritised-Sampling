@@ -21,10 +21,6 @@ rps.lowRes.sparsityBasis = 'dct'; % 'dct', 'daubechies','haar', none
 rps.low.sparsityDecompLevels = [];
 rps.lowRes.solver = 1; % 1= l1, 2 = l2, only for first level
 
-% rps.ri.MeasurementEnsemble = 'random'; % random 0/1, rademacher, walsh
-% rps.ri.numRefinedMeas = 0.1;
-% given in fraction between 0.01 and 1. 10% of num pixels in RoI = 0.1.
-%for walsh measurements, it is a redundant paramter. It is fixed to 20%.
 rps.ri.numDecompLevels_Walsh = 3; % number of levels for walsh decomposition.
 rps.ri.sparsityBasis = 'daubechies';
 rps.ri.sparsityDecompLevels = 3;
@@ -107,23 +103,13 @@ while meas.remainingMeasurements >=0
     rps.seg.ROI{kk,2} = rps.seg.ROI{kk,2} + 1;
     %     calculate the refinement indicator for the next fine scale for the
     %     selected RoI, all other RoIs carry forward their values
-    %     measReq = floor(rps.ri.numRefinedMeas*numel(rps.seg.ROI{kk,1}));
-    %     if  meas.remainingMeasurements > measReq && ~(rps.seg.ROI{kk,2} == 1)
-    %         [V(kk), B{1,kk}, yB] = findRefinementIndicators_github(rois_currentRes{1,kk}, rps.seg.ROI{kk,1},...
-    %             rps.seg.ROI{kk,2}/2, measReq, rps.ri.MeasurementEnsemble, init.noiseDev);
+   
     [V(kk),B,yB,ms] = findRefinementIndicatorsWalsh_github(rois_currentRes{1,kk},rps.seg.ROI{kk,1},...
         rps.ri.numDecompLevels_Walsh, rps.seg.ROI{kk,2}, meas.remainingMeasurements,init.noiseDev);
     meas.ri.y{1,kk} = [meas.ri.y{1,kk}; yB];
     rps.ri.A{1,kk} = [rps.ri.A{1,kk}; B];
     meas.remainingMeasurements = meas.remainingMeasurements - ms;
-    %     else
-    %         if meas.remainingMeasurements < measReq
-    %             fprintf('Not enough measurements available for ROI %d. Current refined resolution level %d\n',kk,rps.seg.ROI{kk,2})
-    %         elseif ROI{kk,2} == 1
-    %             fprintf('Current refined resolution level for ROI %d is already %d\n',kk,rps.seg.ROI{kk,2})
-    %         end
-    %         V(kk) = 0;
-    %     end
+    
     results.RI{1,gg} = V;
     gg = gg + 1;
     results.addedImage = rps.seg.maskC{1,kk}.*results.addedImage + reshape(rps.seg.opR{1,kk}'*rois_currentRes{1,kk}(:),init.m,init.n);
