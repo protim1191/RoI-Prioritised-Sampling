@@ -47,19 +47,7 @@ switch(m)
         end
 end
 omegaCurrLevel = samplesInCurrentLevel(m,currNumLevels,omega);
-%%
-% mask = drawSamples(omega,m,0); %requires by separateWaveletBands for divided frequency space in dyadic levels
-% [~,~,subBandIds] = separateWaveletBands(mask,numLevels);
-% t=[];
-% % find if omega is present in current G,i.e. subBandIds{1,ws}
-% for ii = 1:length(omega)
-%     tt = ismember(omega(ii),subBandIds{1,currNumLevels} );
-%     if tt
-%         t = [t; omega(ii)];
-%     end
-% end
-% omega = t;
-%%
+
 if remMeas >= length(omegaCurrLevel)
     ms = length(omegaCurrLevel);
     R = opRestriction(m*n,omegaCurrLevel);
